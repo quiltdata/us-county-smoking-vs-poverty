@@ -1,0 +1,7 @@
+[
+  "description.md",
+  "src/visualization/vega_specs/us-county-smoking-2015.json",
+  "src/visualization/vega_specs/us-county-poverty-2015.json",
+  "src/visualization/vega_specs/us-county-poverty-vs-smoking-2015.json",
+  "notebooks/summarize_exploratory_data_analysis.ipynb"
+]

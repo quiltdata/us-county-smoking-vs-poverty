@@ -1,0 +1,109 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v4.json",
+  "width": 900,
+  "height": 560,
+  "padding": {"top": 0, "left": 0, "right": 0, "bottom": 0},
+  "signals": [
+    {
+      "name": "hover",
+      "value": null,
+      "on": [
+        {"events": "shape:mouseover", "update": "datum"},
+        {"events": "shape:mouseout", "update": "null"}
+      ]
+    },
+    {
+      "name": "title",
+      "value": "Smoking 2015",
+      "update": "hover ? hover.geo_name + ' (' + format(hover.poverty_2015, '0.1%') + ')' : 'Poverty 2015'"
+    }
+  ],
+  "data": [
+    {
+      "name": "poverty",
+      "url": "../../../data/interim/counties_smoking_poverty_2015-2016.csv",
+      "format": {
+        "type": "csv",
+        "parse": "auto"
+      }
+    },
+    {
+      "name": "counties",
+      "url": "../../../data/external/us-10m.json",
+      "format": {
+        "type": "topojson",
+        "feature": "counties"
+      },
+      "transform": [
+        { "type": "lookup", "from": "poverty", "key": "id", "fields": ["id"], "values": ["geo_name", "poverty_2015"] },
+        { "type": "filter", "expr": "datum.poverty_2015 != null" }
+      ]
+    }
+  ],
+  "projections": [
+    {
+      "name": "projection",
+      "type": "albersUsa",
+      "scale": 1200,
+      "translate": [{"signal": "width / 2"}, {"signal": "height / 2"}]
+    }
+  ],
+  "scales": [
+    {
+      "name": "color",
+      "type": "quantize",
+      "domain": [
+        0,
+        0.7
+      ],
+      "range": {
+        "scheme": "greens",
+        "count": 10
+      }
+    }
+  ],
+  "legends": [
+    {
+      "fill": "color",
+      "orient": "bottom-right",
+      "title": "Poverty",
+      "format": "0.1%"
+    }
+  ],
+  "marks": [
+    {
+      "type": "shape",
+      "from": {"data": "counties"},
+      "encode": {
+        "enter": {
+          "tooltip": {"signal": "{title: datum.geo_name, \"Value\": format(datum.poverty_2015, '0.1%')}"}
+        },
+        "update": {
+          "fill": {"scale": "color", "field": "poverty_2015"}
+        },
+        "hover": {
+          "fill": {"value": "red"}
+        }
+      },
+      "transform": [
+        { "type": "geoshape", "projection": "projection" }
+      ]
+    },
+    {
+      "type": "text",
+      "interactive": false,
+      "encode": {
+        "enter": {
+          "x": {"signal": "width", "offset": -5},
+          "y": {"value": 0},
+          "fill": {"value": "black"},
+          "fontSize": {"value": 20},
+          "align": {"value": "right"}
+        },
+        "update": {
+          "text": {"signal": "title"}
+        }
+      }
+    }
+  ]
+}

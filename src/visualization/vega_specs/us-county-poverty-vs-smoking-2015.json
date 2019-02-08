@@ -1,0 +1,95 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v4.json",
+  "description": "Scatter plot of smoking vs poverty in the US in 2015",
+  "width": 500,
+  "height": 400,
+  "padding": 5,
+  "autosize": "pad",
+  "signals": [
+    {
+      "name": "state",
+      "value": "all",
+      "bind": {
+        "input": "select",
+        "options": [
+          "AL","AK","AZ","AR","CA"," CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY", "all"
+        ]
+      }
+    }
+  ],
+  "data": [
+    {
+      "name": "source",
+      "url": "../../../data/interim/counties_smoking_poverty_2015-2016.csv",
+      "format": {
+        "type": "csv",
+        "parse": "auto"
+      },
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "(datum.smoking_2015 != null && datum.poverty_2015 != null && state === 'all' || datum.smoking_2015 != null && datum.poverty_2015 != null && datum.state === state)"
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "x",
+      "type": "linear",
+      "round": true,
+      "nice": true,
+      "zero": true,
+      "domain": {"data": "source", "field": "smoking_2015"},
+      "range": "width"
+    },
+    {
+      "name": "y",
+      "type": "linear",
+      "round": true,
+      "nice": true,
+      "zero": true,
+      "domain": {"data": "source", "field": "poverty_2015"},
+      "range": "height"
+    }
+  ],
+  "axes": [
+    {
+      "scale": "x",
+      "grid": true,
+      "domain": false,
+      "orient": "bottom",
+      "tickCount": 5,
+      "title": "% Pop. Smokers"
+    },
+    {
+      "scale": "y",
+      "grid": true,
+      "domain": false,
+      "orient": "left",
+      "titlePadding": 5,
+      "title": "% Pop. in Poverty"
+    }
+  ],
+  "marks": [
+    {
+      "name": "marks",
+      "type": "symbol",
+      "from": {"data": "source"},
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "field": "smoking_2015"},
+          "y": {"scale": "y", "field": "poverty_2015"},
+          "shape": {"value": "circle"},
+          "fill": {"value": "blue"},
+          "fillOpacity": {"value": 0.5}
+        },
+        "hover": {
+          "fill": {"value": "firebrick"},
+          "fillOpacity": {"value": 1},
+          "tooltip": {"signal": "datum.geo_name"}
+        }
+      }
+    }
+  ]
+}
